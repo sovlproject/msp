@@ -65,11 +65,18 @@
       margin-bottom: 10px;
     }
 
-    .browse-container iframe {
-      width: 100%;
-      height: 400px;
-      border-radius: 10px;
+    .open-button {
+      background-color: #007AFF;
+      color: white;
+      padding: 10px;
       border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      width: 100%;
+    }
+
+    .open-button:hover {
+      background-color: #005BB5;
     }
   </style>
 </head>
@@ -84,30 +91,24 @@
   <!-- Browse Tab 1 -->
   <div id="browse1" class="content active">
     <div class="browser-container">
-      <input type="text" id="websiteUrl1" placeholder="Enter website URL" onkeydown="handleEnter(event, 1)">
-      <div class="browse-container">
-        <iframe id="browserFrame1"></iframe>
-      </div>
+      <input type="text" id="websiteUrl1" placeholder="Enter website URL">
+      <button class="open-button" onclick="openWebsite(1)">Open</button>
     </div>
   </div>
 
   <!-- Browse Tab 2 -->
   <div id="browse2" class="content">
     <div class="browser-container">
-      <input type="text" id="websiteUrl2" placeholder="Enter website URL" onkeydown="handleEnter(event, 2)">
-      <div class="browse-container">
-        <iframe id="browserFrame2"></iframe>
-      </div>
+      <input type="text" id="websiteUrl2" placeholder="Enter website URL">
+      <button class="open-button" onclick="openWebsite(2)">Open</button>
     </div>
   </div>
 
   <!-- Browse Tab 3 -->
   <div id="browse3" class="content">
     <div class="browser-container">
-      <input type="text" id="websiteUrl3" placeholder="Enter website URL" onkeydown="handleEnter(event, 3)">
-      <div class="browse-container">
-        <iframe id="browserFrame3"></iframe>
-      </div>
+      <input type="text" id="websiteUrl3" placeholder="Enter website URL">
+      <button class="open-button" onclick="openWebsite(3)">Open</button>
     </div>
   </div>
 
@@ -119,13 +120,7 @@
       document.querySelector(`.tab:contains('${tab}')`).classList.add("active");
     }
 
-    function handleEnter(event, tabNumber) {
-      if (event.key === "Enter") {
-        loadWebsite(tabNumber);
-      }
-    }
-
-    function loadWebsite(tabNumber) {
+    function openWebsite(tabNumber) {
       let input = document.getElementById(`websiteUrl${tabNumber}`);
       let url = input.value.trim();
 
@@ -134,8 +129,8 @@
         url = "https://" + url;
       }
 
-      // Load into iframe
-      document.getElementById(`browserFrame${tabNumber}`).src = url;
+      // Open in a new tab/window
+      window.open(url, `_blank`);
     }
   </script>
 
