@@ -190,16 +190,23 @@
     }
 
     function getYouTubeVideoId(url) {
-      const regex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S+\/)?([a-zA-Z0-9_-]{11}))(?:\S*)?/;
+      // Updated regex to handle both https:// and non-https:// with ?si=...
+      const regex = /(?:https?:\/\/)?(?:www\.)?youtu\.be\/([a-zA-Z0-9_-]{11})(?:[?&].*)?/;
       const match = url.match(regex);
       return match ? match[1] : null;
     }
 
     function openWebsite(urlInputId, contentId) {
-      const websiteUrl = document.getElementById(urlInputId).value;
+      let websiteUrl = document.getElementById(urlInputId).value;
+
+      // Add https:// if missing
+      if (!/^https?:\/\//i.test(websiteUrl)) {
+        websiteUrl = 'https://' + websiteUrl;
+      }
+
       if (websiteUrl) {
         const contentDiv = document.getElementById(contentId);
-        contentDiv.innerHTML = `<iframe src="https://${websiteUrl}" width="100%" height="400px" frameborder="0"></iframe>`;
+        contentDiv.innerHTML = `<iframe src="${websiteUrl}" width="100%" height="400px" frameborder="0"></iframe>`;
       } else {
         alert('Please enter a website URL');
       }
