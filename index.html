@@ -7,7 +7,7 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: rgba(0, 0, 0, 0.5); 
+      background: rgba(0, 0, 0, 0.5);
       color: white;
       margin: 0;
       padding: 0;
@@ -86,6 +86,9 @@
       background-color: #005BB5;
     }
 
+    .audio-player {
+      margin-bottom: 20px;
+    }
   </style>
 </head>
 <body>
@@ -94,25 +97,46 @@
     <h1>Audio/Video Player</h1>
 
     <div class="tabs">
-      <div class="tab active" onclick="showTab('browse')">Browse</div>
+      <div class="tab active" onclick="showTab('local')">Local</div>
       <div class="tab" onclick="showTab('ytstream')">YT Stream</div>
+      <div class="tab" onclick="showTab('browse')">Browse</div>
     </div>
 
-    <!-- Browse Tab -->
-    <div id="browse" class="content active">
-      <div class="file-input">
-        <input type="file" accept=".mp3, .wav, .m4a, .aac, .ogg, .flac" id="audioFile" onchange="loadAudio()">
+    <!-- Local Tab -->
+    <div id="local" class="content active">
+      <h2>Local Audio Players</h2>
+      
+      <!-- Player 1 -->
+      <div class="audio-player">
+        <input type="file" accept=".mp3, .wav, .m4a, .aac, .ogg, .flac" id="audioFile1" onchange="loadAudio(1)">
+        <audio id="audioPlayer1" controls></audio>
       </div>
-      <audio id="audioPlayer" controls></audio>
+
+      <!-- Player 2 -->
+      <div class="audio-player">
+        <input type="file" accept=".mp3, .wav, .m4a, .aac, .ogg, .flac" id="audioFile2" onchange="loadAudio(2)">
+        <audio id="audioPlayer2" controls></audio>
+      </div>
     </div>
 
     <!-- YT Stream Tab -->
     <div id="ytstream" class="content">
+      <h2>YouTube Video Stream</h2>
       <div class="url-input">
         <input type="text" id="ytUrl" placeholder="Enter YouTube URL (e.g., https://youtu.be/videoID)" />
       </div>
       <button onclick="loadYT()">Stream YouTube</button>
       <div id="ytPlayer"></div>
+    </div>
+
+    <!-- Browse Tab -->
+    <div id="browse" class="content">
+      <h2>Browse Web</h2>
+      <div class="url-input">
+        <input type="text" id="websiteUrl" placeholder="Enter website URL (e.g., example.com)" />
+      </div>
+      <button onclick="openWebsite()">Open Website</button>
+      <div id="websiteContent"></div>
     </div>
 
   </div>
@@ -129,12 +153,12 @@
       activeTabButton.classList.add('active');
     }
 
-    function loadAudio() {
-      const fileInput = document.getElementById('audioFile');
+    function loadAudio(playerNumber) {
+      const fileInput = document.getElementById(`audioFile${playerNumber}`);
       const file = fileInput.files[0];
       if (file) {
         const audioUrl = URL.createObjectURL(file);
-        const audioPlayer = document.getElementById('audioPlayer');
+        const audioPlayer = document.getElementById(`audioPlayer${playerNumber}`);
         audioPlayer.src = audioUrl;
       }
     }
@@ -158,6 +182,16 @@
       const regex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S+\/)?(\S{11}))(?:\S*)?/;
       const match = url.match(regex);
       return match ? match[1] : null;
+    }
+
+    function openWebsite() {
+      const websiteUrl = document.getElementById('websiteUrl').value;
+      if (websiteUrl) {
+        const contentDiv = document.getElementById('websiteContent');
+        contentDiv.innerHTML = `<iframe src="https://${websiteUrl}" width="100%" height="400px" frameborder="0"></iframe>`;
+      } else {
+        alert('Please enter a website URL');
+      }
     }
   </script>
 
