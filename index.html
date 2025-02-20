@@ -78,6 +78,12 @@
     .open-button:hover {
       background-color: #005BB5;
     }
+
+    iframe {
+      width: 100%;
+      height: 400px;
+      border: none;
+    }
   </style>
 </head>
 <body>
@@ -93,6 +99,7 @@
     <div class="browser-container">
       <input type="text" id="websiteUrl1" placeholder="Enter website URL">
       <button class="open-button" onclick="openWebsite(1)">Open</button>
+      <iframe id="iframe1"></iframe>
     </div>
   </div>
 
@@ -101,6 +108,7 @@
     <div class="browser-container">
       <input type="text" id="websiteUrl2" placeholder="Enter website URL">
       <button class="open-button" onclick="openWebsite(2)">Open</button>
+      <iframe id="iframe2"></iframe>
     </div>
   </div>
 
@@ -109,6 +117,7 @@
     <div class="browser-container">
       <input type="text" id="websiteUrl3" placeholder="Enter website URL">
       <button class="open-button" onclick="openWebsite(3)">Open</button>
+      <iframe id="iframe3"></iframe>
     </div>
   </div>
 
@@ -129,8 +138,9 @@
         url = "https://" + url;
       }
 
-      // Open in a new tab/window
-      window.open(url, `_blank`);
+      // Set iframe source for the current tab
+      let iframe = document.getElementById(`iframe${tabNumber}`);
+      iframe.src = url;
     }
   </script>
 
