@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Multi Audio Player</title>
+  <title>Mini Chromium</title>
   <style>
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
@@ -51,41 +51,10 @@
       display: block;
     }
 
-    .player-container {
-      margin-bottom: 20px;
-    }
-
-    .file-input {
-      width: 100%;
-      margin-bottom: 10px;
-    }
-
-    .play-button {
-      width: 100%;
-      background-color: #007AFF;
-      color: white;
-      padding: 10px;
-      font-size: 16px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      text-align: center;
-    }
-
-    .play-button:hover {
-      background-color: #005BB5;
-    }
-
-    .youtube-container {
+    .browser-container {
       display: flex;
       flex-direction: column;
       align-items: center;
-    }
-
-    #youtubePlayer {
-      width: 100%;
-      height: 200px;
-      margin-bottom: 10px;
     }
 
     input {
@@ -93,6 +62,7 @@
       padding: 8px;
       border-radius: 5px;
       border: none;
+      margin-bottom: 10px;
     }
 
     .browse-container iframe {
@@ -106,39 +76,38 @@
 <body>
 
   <div class="tabs">
-    <div class="tab active" onclick="switchTab('local')">Local</div>
-    <div class="tab" onclick="switchTab('stream')">Stream</div>
-    <div class="tab" onclick="switchTab('browse')">Browse</div>
+    <div class="tab active" onclick="switchTab('browse1')">Browse 1</div>
+    <div class="tab" onclick="switchTab('browse2')">Browse 2</div>
+    <div class="tab" onclick="switchTab('browse3')">Browse 3</div>
   </div>
 
-  <!-- Local Audio Players -->
-  <div id="local" class="content active">
-    <div class="player-container">
-      <h2>Player 1</h2>
-      <input type="file" accept="audio/*" id="audioFile1" onchange="loadAudio(1)">
-      <audio id="audioPlayer1" controls></audio>
-    </div>
-
-    <div class="player-container">
-      <h2>Player 2</h2>
-      <input type="file" accept="audio/*" id="audioFile2" onchange="loadAudio(2)">
-      <audio id="audioPlayer2" controls></audio>
+  <!-- Browse Tab 1 -->
+  <div id="browse1" class="content active">
+    <div class="browser-container">
+      <input type="text" id="websiteUrl1" placeholder="Enter website URL" onkeydown="handleEnter(event, 1)">
+      <div class="browse-container">
+        <iframe id="browserFrame1"></iframe>
+      </div>
     </div>
   </div>
 
-  <!-- YouTube Stream -->
-  <div id="stream" class="content">
-    <div class="youtube-container">
-      <input type="text" id="youtubeUrl" placeholder="Paste YouTube URL" onblur="loadYouTubeVideo()">
-      <div id="youtubePlayer"></div>
+  <!-- Browse Tab 2 -->
+  <div id="browse2" class="content">
+    <div class="browser-container">
+      <input type="text" id="websiteUrl2" placeholder="Enter website URL" onkeydown="handleEnter(event, 2)">
+      <div class="browse-container">
+        <iframe id="browserFrame2"></iframe>
+      </div>
     </div>
   </div>
 
-  <!-- Browse Websites -->
-  <div id="browse" class="content">
-    <input type="text" id="websiteUrl" placeholder="Enter website URL" onblur="loadWebsite()">
-    <div class="browse-container">
-      <iframe id="browserFrame"></iframe>
+  <!-- Browse Tab 3 -->
+  <div id="browse3" class="content">
+    <div class="browser-container">
+      <input type="text" id="websiteUrl3" placeholder="Enter website URL" onkeydown="handleEnter(event, 3)">
+      <div class="browse-container">
+        <iframe id="browserFrame3"></iframe>
+      </div>
     </div>
   </div>
 
@@ -150,52 +119,24 @@
       document.querySelector(`.tab:contains('${tab}')`).classList.add("active");
     }
 
-    function loadAudio(playerNumber) {
-      const fileInput = document.getElementById(`audioFile${playerNumber}`);
-      const file = fileInput.files[0];
-      if (!file) return;
-
-      const audioUrl = URL.createObjectURL(file);
-      document.getElementById(`audioPlayer${playerNumber}`).src = audioUrl;
-    }
-
-    function loadYouTubeVideo() {
-      const url = document.getElementById("youtubeUrl").value;
-      const videoId = extractYouTubeID(url);
-      if (!videoId) return alert("Invalid YouTube URL");
-
-      if (youtubePlayer) {
-        youtubePlayer.loadVideoById(videoId);
-      } else {
-        youtubePlayer = new YT.Player('youtubePlayer', {
-          height: '200',
-          width: '100%',
-          videoId: videoId,
-          playerVars: { 'playsinline': 1 }
-        });
+    function handleEnter(event, tabNumber) {
+      if (event.key === "Enter") {
+        loadWebsite(tabNumber);
       }
     }
 
-    function extractYouTubeID(url) {
-      const regex = /(?:youtube\.com\/(?:[^/]+\/[^/]+|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
-      const match = url.match(regex);
-      return match ? match[1] : null;
-    }
+    function loadWebsite(tabNumber) {
+      let input = document.getElementById(`websiteUrl${tabNumber}`);
+      let url = input.value.trim();
 
-    function loadWebsite() {
-      const url = document.getElementById("websiteUrl").value;
-      if (!url.startsWith("http")) {
-        alert("Invalid URL. Please enter a full URL starting with http:// or https://");
-        return;
+      // Auto-correct URLs
+      if (!url.startsWith("http://") && !url.startsWith("https://")) {
+        url = "https://" + url;
       }
-      document.getElementById("browserFrame").src = url;
-    }
 
-    // Load YouTube API
-    let tag = document.createElement('script');
-    tag.src = "https://www.youtube.com/iframe_api";
-    let firstScriptTag = document.getElementsByTagName('script')[0];
-    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+      // Load into iframe
+      document.getElementById(`browserFrame${tabNumber}`).src = url;
+    }
   </script>
 
 </body>
