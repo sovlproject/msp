@@ -3,80 +3,54 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mini Chromium</title>
+  <title>Audio/Video Player</title>
   <style>
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
-      background: rgba(0, 0, 0, 0.5);
+      font-family: Arial, sans-serif;
+      background: rgba(0, 0, 0, 0.5); 
       color: white;
       margin: 0;
       padding: 0;
       height: 100vh;
       display: flex;
-      flex-direction: column;
-      align-items: center;
       justify-content: center;
+      align-items: center;
       backdrop-filter: blur(10px);
+    }
+
+    h1 {
+      font-size: 32px;
+      margin-bottom: 20px;
+      text-align: center;
+      font-weight: 700;
     }
 
     .tabs {
       display: flex;
-      gap: 10px;
+      justify-content: space-around;
+      width: 100%;
       margin-bottom: 20px;
     }
 
     .tab {
-      padding: 10px 15px;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 10px 20px;
+      border-radius: 12px;
       cursor: pointer;
-      background: #007AFF;
-      border-radius: 8px;
-      text-align: center;
     }
 
-    .tab.active {
-      background: #005BB5;
+    .active {
+      background: rgba(0, 123, 255, 0.8);
     }
 
     .content {
       display: none;
-      width: 90%;
-      max-width: 400px;
-      padding: 20px;
-      background: rgba(0, 0, 0, 0.7);
-      border-radius: 12px;
-      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
+      width: 100%;
+      max-width: 700px;
     }
 
     .content.active {
       display: block;
-    }
-
-    .browser-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    input {
-      width: 100%;
-      padding: 8px;
-      border-radius: 5px;
-      border: none;
-      margin-bottom: 10px;
-    }
-
-    .open-button {
-      background-color: #007AFF;
-      color: white;
-      padding: 10px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      width: 100%;
-    }
-
-    .open-button:hover {
-      background-color: #005BB5;
     }
 
     iframe {
@@ -84,63 +58,106 @@
       height: 400px;
       border: none;
     }
+
+    .file-input, .url-input {
+      margin-bottom: 20px;
+    }
+
+    input[type="file"], input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: none;
+    }
+
+    button {
+      background-color: #007AFF;
+      color: white;
+      padding: 10px;
+      font-size: 18px;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      width: 100%;
+    }
+
+    button:hover {
+      background-color: #005BB5;
+    }
+
   </style>
 </head>
 <body>
 
-  <div class="tabs">
-    <div class="tab active" onclick="switchTab('browse1')">Browse 1</div>
-    <div class="tab" onclick="switchTab('browse2')">Browse 2</div>
-    <div class="tab" onclick="switchTab('browse3')">Browse 3</div>
-  </div>
+  <div class="container">
+    <h1>Audio/Video Player</h1>
 
-  <!-- Browse Tab 1 -->
-  <div id="browse1" class="content active">
-    <div class="browser-container">
-      <input type="text" id="websiteUrl1" placeholder="Enter website URL">
-      <button class="open-button" onclick="openWebsite(1)">Open</button>
-      <iframe id="iframe1"></iframe>
+    <div class="tabs">
+      <div class="tab active" onclick="showTab('browse')">Browse</div>
+      <div class="tab" onclick="showTab('ytstream')">YT Stream</div>
     </div>
-  </div>
 
-  <!-- Browse Tab 2 -->
-  <div id="browse2" class="content">
-    <div class="browser-container">
-      <input type="text" id="websiteUrl2" placeholder="Enter website URL">
-      <button class="open-button" onclick="openWebsite(2)">Open</button>
-      <iframe id="iframe2"></iframe>
+    <!-- Browse Tab -->
+    <div id="browse" class="content active">
+      <div class="file-input">
+        <input type="file" accept=".mp3, .wav, .m4a, .aac, .ogg, .flac" id="audioFile" onchange="loadAudio()">
+      </div>
+      <audio id="audioPlayer" controls></audio>
     </div>
-  </div>
 
-  <!-- Browse Tab 3 -->
-  <div id="browse3" class="content">
-    <div class="browser-container">
-      <input type="text" id="websiteUrl3" placeholder="Enter website URL">
-      <button class="open-button" onclick="openWebsite(3)">Open</button>
-      <iframe id="iframe3"></iframe>
+    <!-- YT Stream Tab -->
+    <div id="ytstream" class="content">
+      <div class="url-input">
+        <input type="text" id="ytUrl" placeholder="Enter YouTube URL (e.g., https://youtu.be/videoID)" />
+      </div>
+      <button onclick="loadYT()">Stream YouTube</button>
+      <div id="ytPlayer"></div>
     </div>
+
   </div>
 
   <script>
-    function switchTab(tab) {
-      document.querySelectorAll(".content").forEach(c => c.classList.remove("active"));
-      document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
-      document.getElementById(tab).classList.add("active");
-      document.querySelector(`.tab:contains('${tab}')`).classList.add("active");
+    function showTab(tabId) {
+      const tabs = document.querySelectorAll('.content');
+      const tabButtons = document.querySelectorAll('.tab');
+      tabs.forEach(tab => tab.classList.remove('active'));
+      tabButtons.forEach(button => button.classList.remove('active'));
+
+      document.getElementById(tabId).classList.add('active');
+      const activeTabButton = [...tabButtons].find(button => button.textContent.toLowerCase() === tabId);
+      activeTabButton.classList.add('active');
     }
 
-    function openWebsite(tabNumber) {
-      let input = document.getElementById(`websiteUrl${tabNumber}`);
-      let url = input.value.trim();
-
-      // Auto-correct URLs
-      if (!url.startsWith("http://") && !url.startsWith("https://")) {
-        url = "https://" + url;
+    function loadAudio() {
+      const fileInput = document.getElementById('audioFile');
+      const file = fileInput.files[0];
+      if (file) {
+        const audioUrl = URL.createObjectURL(file);
+        const audioPlayer = document.getElementById('audioPlayer');
+        audioPlayer.src = audioUrl;
       }
+    }
 
-      // Set iframe source for the current tab
-      let iframe = document.getElementById(`iframe${tabNumber}`);
-      iframe.src = url;
+    function loadYT() {
+      const ytUrl = document.getElementById('ytUrl').value;
+      if (ytUrl) {
+        const videoId = getYouTubeVideoId(ytUrl);
+        if (videoId) {
+          const ytPlayer = document.getElementById('ytPlayer');
+          ytPlayer.innerHTML = `<iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+        } else {
+          alert('Invalid YouTube URL');
+        }
+      } else {
+        alert('Please enter a YouTube URL');
+      }
+    }
+
+    function getYouTubeVideoId(url) {
+      const regex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S+\/)?(\S{11}))(?:\S*)?/;
+      const match = url.match(regex);
+      return match ? match[1] : null;
     }
   </script>
 
